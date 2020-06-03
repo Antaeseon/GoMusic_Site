@@ -1,13 +1,28 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import "fmt"
+
+func panicTest(p bool) {
+	defer checkPanic()
+	if p {
+		panic("panic requested")
+	}
+}
+
+func checkPanic() {
+	if r := recover(); r != nil {
+		fmt.Println("A Panic wa captured, message :", r)
+	}
+}
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	panicTest(true)
+	fmt.Println("hello world")
+	i := 1
+	for true {
+		i++
+		if i == 10 {
+			break
+		}
+	}
 }
