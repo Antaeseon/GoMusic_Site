@@ -1,28 +1,30 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
-func panicTest(p bool) {
-	defer checkPanic()
-	if p {
-		panic("panic requested")
+func runLoopSend(n int, ch chan int) {
+	for i := 0; i < n; i++ {
+		ch <- i
 	}
+	close(ch)
 }
 
-func checkPanic() {
-	if r := recover(); r != nil {
-		fmt.Println("A Panic wa captured, message :", r)
+func runLoopReceive(ch chan int) {
+	for {
+		i, ok := <-ch
+		if !ok {
+			break
+		}
+		fmt.Println("Received value:", i)
 	}
 }
 
 func main() {
-	panicTest(true)
-	fmt.Println("hello world")
-	i := 1
-	for true {
-		i++
-		if i == 10 {
-			break
-		}
-	}
+	myChannel := make(chan int)
+	go runLoopSend(10, myChannel)
+	go runLoopReceive(myChannel)
+	time.Sleep(2 * time.Second)
 }
