@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"sync"
 )
 
+var wg = &sync.WaitGroup{}
+
 func runLoopSend(n int, ch chan int) {
+
+	defer wg.Done()
 	for i := 0; i < n; i++ {
 		ch <- i
 	}
@@ -13,6 +17,8 @@ func runLoopSend(n int, ch chan int) {
 }
 
 func runLoopReceive(ch chan int) {
+
+	defer wg.Done()
 	for {
 		i, ok := <-ch
 		if !ok {
@@ -24,7 +30,8 @@ func runLoopReceive(ch chan int) {
 
 func main() {
 	myChannel := make(chan int)
+	wg.Add(2)
 	go runLoopSend(10, myChannel)
 	go runLoopReceive(myChannel)
-	time.Sleep(2 * time.Second)
+	wg.Wait()
 }
