@@ -4,13 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RunAPI(address string) error {
+func RunAPIWithHandler(address string, h HandlerInterface) error {
 	//Get gin's default engine
 	r := gin.Default()
-	//Define a handler
-	h, _ := NewHandler()
-	//load homepage
-	r.GET("/", h.GetMainPage)
 	//get products
 	r.GET("/products", h.GetProducts)
 	//get promos
@@ -39,4 +35,12 @@ func RunAPI(address string) error {
 		usersGroup.POST("", h.AddUser)
 	}
 	return r.Run(address)
+}
+
+func RunAPI(address string) error {
+	h, err := NewHandler()
+	if err != nil {
+		return err
+	}
+	return RunAPIWithHandler(address, h)
 }
